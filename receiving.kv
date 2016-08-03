@@ -1,0 +1,58 @@
+
+
+ReceivingRoot:
+
+<ReceivingRoot>:
+	MainMenu
+
+<MainMenu>:
+	orientation: 'vertical'
+	Button:
+		text: 'New Report'
+		on_release: app.root.new_report()
+	Button:
+		text: 'View Reports'
+
+<New_Report>:
+	orientation: 'vertical'
+	Label:
+		text: 'ITEM LIST'
+		size_hint_y: None
+		size_y: '10dp'
+	Item_Scroller
+
+
+<Item_Scroller>:
+#	size_hint: (None, None)
+#	size: (500, 320)
+#	pos_hint: {'center_x': .5, 'center_y': .5}
+	do_scroll_x: False
+	Item_List:
+		id: itemlist
+		cols: 1
+		size_hint: (None, None)
+		width: app.root.width
+		Button:
+			text: 'test'
+			size_hint_y: None
+			size_y: 40
+			on_press: itemlist.add_button()
+		Button:
+			text: 'test'
+			size_hint_y: None
+			size_y: 40
+		Button:
+			text: 'test'
+			size_hint_y: None
+			size_y: 40
+		Button:
+			text: 'test'
+			size_hint_y: None
+			size_y: 40
+
+
+
+<GridLayout>:
+	canvas:
+		Color:
+			rgb: 1, 1, 0
