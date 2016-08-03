@@ -7,6 +7,7 @@ ReceivingRoot:
 
 <Tabs>:
 	do_default_tab: False
+	id: tabs
 
 	TabbedPanelItem:
 		text: 'Menu'
@@ -31,44 +32,73 @@ ReceivingRoot:
 		on_release: app.root.items_test()
 
 <New_Report>:
+	id: newreport
 	orientation: 'vertical'
 
-	Label:
-		text: 'ITEM LIST'
-		size_hint_y: None
-		size_y: '10dp'
+	Search_Bar
 
 	Item_Scroller
 
 
 <Item_Scroller>:
+	id: itemscroller
 #	size_hint: (None, None)
 #	size: (500, 320)
 #	pos_hint: {'center_x': .5, 'center_y': .5}
-	do_scroll_x: False
+#	do_scroll_x: False
 	Item_List:
 		id: itemlist
 		cols: 1
-		size_hint: (None, None)
 		width: root.width
-		Button:
-			text: 'test'
-			size_hint_y: None
-			size_y: 40
-			on_press: itemlist.add_button()
-		Button:
-			text: 'test'
-			size_hint_y: None
-			size_y: 40
-		Button:
-			text: 'test'
-			size_hint_y: None
-			size_y: 40
-		Button:
-			text: 'test'
-			size_hint_y: None
-			size_y: 40
+		size_hint: (None, None)
 
+
+<Item_Selector>:
+	label: label
+	orientation: 'vertical'
+	size_hint_y: None
+	size_y: '40dp'
+#	size_hint: (None, None)
+
+	Label:
+		id: label
+		text: '*'
+		text_size: root.width, None
+		size: self.texture_size
+	BoxLayout:
+
+		orientation: 'horizontal'
+		Slider:
+			size_hint_x: 0.75
+			id: slider
+			step: 1
+			range: (0, 100)
+
+		Label:
+			size_hint_x: 0.05
+			text: str(int(slider.value))
+
+		Button:
+			size_hint_x: 0.2
+			text: 'Add'
+
+<Search_Bar>:
+	orientation: 'horizontal'
+	size_hint_y: 0.1
+	search_input: search_box
+
+	Label:
+		size_hint_x: 0.25
+		text: 'Search'
+
+	TextInput:
+		id: search_box
+		size_hint_x: 0.75
+		multiline: False
+		on_text_validate: self.parent.parent.children[0].children[0].item_search(self.text)
+
+<Item_List>:
+	id: itemlist
 
 
 <GridLayout>:

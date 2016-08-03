@@ -17,8 +17,7 @@ import gspread
 import json
 from oauth2client.service_account import ServiceAccountCredentials
 
-item_list = []
-master_list = []
+
 store = JsonStore('item_list.json')
 
 
@@ -68,19 +67,33 @@ class Item_List(GridLayout):
 		self.add_button()
 		self.bind(minimum_height=self.setter('height'))
 
-
+	def item_search(self, search):
+		self.clear_widgets()
+		for key in store['itemslist']['items']:
+			selector = (Item_Selector())
+			if search in store['itemslist']['items'][key]:
+				print 'hooray!'
+				selector.label.text = store['itemslist']['items'][key]
+				selector.id = 'code_%s' % key
+				self.add_widget(selector)
 
 
 	def add_button(self):
 		global store
 		self.clear_widgets()
 		for key in store['itemslist']['items']:
-				btn = Button(
+			selector = (Item_Selector())
+			selector.label.text = key + ':   ' + store['itemslist']['items'][key]
+			selector.id = 'code_%s' % key
+			self.add_widget(selector)
+
+'''				btn = Button(
 					text=store['itemslist']['items'][key],
 					size_x=self.width, 
 					size_y=40, 
 					size_hint_y=None)
 				self.add_widget(btn)
+'''
 
 
 
@@ -88,7 +101,11 @@ class Tabs(TabbedPanel):
 	pass
 
 
+class Item_Selector(BoxLayout):
+	pass
 
+class Search_Bar(BoxLayout):
+	search_input = ObjectProperty()
 
 
 def authgoogle():
