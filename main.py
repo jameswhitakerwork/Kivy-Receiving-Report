@@ -7,6 +7,9 @@ from kivy.properties import ObjectProperty
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.storage.jsonstore import JsonStore
+
 
 import sys
 import smtplib
@@ -16,6 +19,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 item_list = []
 master_list = []
+store = JsonStore('item_list.json')
 
 
 
@@ -27,12 +31,22 @@ class ReceivingApp(App):
 
 
 class ReceivingRoot(BoxLayout):
-	def new_report(self):
+	def __init__(self, **kwargs):
+		global store
+		super(ReceivingRoot, self).__init__(**kwargs)
+		store = JsonStore('item_list.json')
+
+	def refresh_items(self):
 		global item_list
-		self.clear_widgets()
-		self.add_widget(New_Report())
+		global store
 		wks = authgoogle()
 		item_list, masterlist = downloadrows(wks)
+		store.clear()
+		store.put('itemslist', items=masterlist)
+
+	def items_test(self):
+		global store
+		print store['itemslist']
 
 
 
@@ -44,7 +58,6 @@ class New_Report(BoxLayout):
 class Item_Scroller(ScrollView):
 	def __init__(self, **kwargs):
 		super(Item_Scroller, self).__init__(**kwargs)
-		print 'New Report built'
 
 
 
@@ -52,23 +65,27 @@ class Item_List(GridLayout):
 	
 	def __init__(self, **kwargs):
 		super(Item_List, self).__init__(**kwargs)
-		self.bind(minimum_height=self.setter('height'))
 		self.add_button()
+		self.bind(minimum_height=self.setter('height'))
+
 
 
 
 	def add_button(self):
-		print item_list
-		for i in range(1, len(item_list)):
-			btn = Button(
-				text=item_list[i],
-				size_x=self.width, 
-				size_y=40, 
-				size_hint_y=None)
-			self.add_widget(btn)
+		global store
+		self.clear_widgets()
+		for key in store['itemslist']['items']:
+				btn = Button(
+					text=store['itemslist']['items'][key],
+					size_x=self.width, 
+					size_y=40, 
+					size_hint_y=None)
+				self.add_widget(btn)
 
 
 
+class Tabs(TabbedPanel):
+	pass
 
 
 
@@ -99,19 +116,15 @@ def downloadrows(wks):
 
 
 	#grab lists
-	code_list = wks.col_values(2)[3:132]
+	uom_list = wks.col_values(2)[3:132]
 	item_list = wks.col_values(3)[3:132]
-	uoms_list = wks.col_values(4)[3:132]
 
 	#build list of lists
-	masterlist = []
+	masterlist = {}
 
-	for i in range(0, len(code_list)):
-		minilist = []
-		minilist.append(code_list[i])
-		minilist.append(item_list[i])
-		minilist.append(uoms_list[i])
-		masterlist.append(minilist)
+	for i in range(0, len(item_list)):
+		masterlist[uom_list[i]] = item_list[i]
+	print masterlist
 
 
 	return item_list, masterlist

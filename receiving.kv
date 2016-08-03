@@ -3,22 +3,41 @@
 ReceivingRoot:
 
 <ReceivingRoot>:
-	MainMenu
+	Tabs
+
+<Tabs>:
+	do_default_tab: False
+
+	TabbedPanelItem:
+		text: 'Menu'
+		BoxLayout:
+			MainMenu
+
+
+	TabbedPanelItem:
+		text: 'Add Items'
+		New_Report
+
 
 <MainMenu>:
 	orientation: 'vertical'
+#	height: root.height
 	Button:
-		text: 'New Report'
-		on_release: app.root.new_report()
+		text: 'Refresh Items List'
+		on_release: app.root.refresh_items()
+
 	Button:
 		text: 'View Reports'
+		on_release: app.root.items_test()
 
 <New_Report>:
 	orientation: 'vertical'
+
 	Label:
 		text: 'ITEM LIST'
 		size_hint_y: None
 		size_y: '10dp'
+
 	Item_Scroller
 
 
@@ -31,7 +50,7 @@ ReceivingRoot:
 		id: itemlist
 		cols: 1
 		size_hint: (None, None)
-		width: app.root.width
+		width: root.width
 		Button:
 			text: 'test'
 			size_hint_y: None
