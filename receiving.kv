@@ -3,57 +3,143 @@
 ReceivingRoot:
 
 <ReceivingRoot>:
+#1
 	Tabs
 
 <Tabs>:
+#2
 	do_default_tab: False
 	id: tabs
 
-	TabbedPanelItem:
-		text: 'Menu'
-		BoxLayout:
-			MainMenu
+#	TabbedPanelItem:
+#	#3
+#		text: 'Menu'
+#		BoxLayout:
+		#4
+#			MainMenu
 
 
 	TabbedPanelItem:
+	#3
 		text: 'Add Items'
-		New_Report
+		Add_Items_Tab
+
+	TabbedPanelItem:
+		text: 'Current Items'
+		Current_List_Tab
 
 
 <MainMenu>:
+#5
 	orientation: 'vertical'
-#	height: root.height
 	Button:
 		text: 'Refresh Items List'
+		on_release: app.root.loading_popup()
 		on_release: app.root.refresh_items()
 
 	Button:
 		text: 'View Reports'
 		on_release: app.root.items_test()
 
-<New_Report>:
-	id: newreport
+<Loading_Popup>:
+	title: 'Loading...' 
+	Button:
+		text: 'close'
+		on_release: root.dismiss
+
+<Add_Items_Tab>:
+#4
+	id: additemstab
 	orientation: 'vertical'
 
 	Search_Bar
 
 	Item_Scroller
 
+<Current_List_Tab>:
+	Current_Scroller
+
+<Current_Scroller>:
+	Current_List:
+		id: currentlist
+		cols: 1
+		width: root.width
+		size_hint: (None, None)
+
+<Current_List>:
+	orientation: 'vertical'
+	cols: 1
+#	size_x: root.width
+	size_hint: (None, None)
+
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+	Current_Selector
+
+
+<Current_Selector>:
+	size_hint_y: None
+	size_y: '40dp'
+	orientation: 'horizontal'
+	Label:
+		text: 'Label'
+	Button:
+		text: 'Button'
+	Button:
+		text: 'Button'
+
+
+<Search_Bar>:
+#5
+#Parent: Add_Items_Tab
+	orientation: 'horizontal'
+	size_hint_y: 0.1
+	search_input: search_box
+
+	Button:
+		size_hint_x: 0.25
+		text: 'Refresh Items'
+		on_release: app.root.refresh_items()
+
+
+	Button:
+		size_hint_x: 0.25
+		text: 'Search'
+		on_release: self.parent.parent.children[0].children[0].item_search(search_box.text)
+
+	TextInput:
+		id: search_box
+		size_hint_x: 0.75
+		multiline: False
+		on_text_validate: self.parent.parent.children[0].children[0].item_search(self.text)
 
 <Item_Scroller>:
+#5
+#parent: Add_Items_Tab
 	id: itemscroller
-#	size_hint: (None, None)
-#	size: (500, 320)
-#	pos_hint: {'center_x': .5, 'center_y': .5}
-#	do_scroll_x: False
+
 	Item_List:
 		id: itemlist
 		cols: 1
 		width: root.width
 		size_hint: (None, None)
 
+<Item_List>:
+#6
+#parent: Item_Scroller
+	id: itemlist
 
 <Item_Selector>:
+#7
+#parent: Item_List
 	label: label
 	orientation: 'vertical'
 	size_hint_y: None
@@ -65,8 +151,8 @@ ReceivingRoot:
 		text: '*'
 		text_size: root.width, None
 		size: self.texture_size
-	BoxLayout:
 
+	BoxLayout:
 		orientation: 'horizontal'
 		Slider:
 			size_hint_x: 0.75
@@ -81,24 +167,13 @@ ReceivingRoot:
 		Button:
 			size_hint_x: 0.2
 			text: 'Add'
+			on_release: 
+				self.parent.parent.parent.add_item(self.parent.parent.id, slider.value)
+				slider.value = 0
 
-<Search_Bar>:
-	orientation: 'horizontal'
-	size_hint_y: 0.1
-	search_input: search_box
 
-	Label:
-		size_hint_x: 0.25
-		text: 'Search'
 
-	TextInput:
-		id: search_box
-		size_hint_x: 0.75
-		multiline: False
-		on_text_validate: self.parent.parent.children[0].children[0].item_search(self.text)
 
-<Item_List>:
-	id: itemlist
 
 
 <GridLayout>:

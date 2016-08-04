@@ -9,6 +9,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.storage.jsonstore import JsonStore
+from kivy.uix.popup import Popup
 
 
 import sys
@@ -19,6 +20,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 
 store = JsonStore('item_list.json')
+
 
 
 
@@ -33,24 +35,39 @@ class ReceivingRoot(BoxLayout):
 	def __init__(self, **kwargs):
 		global store
 		super(ReceivingRoot, self).__init__(**kwargs)
-		store = JsonStore('item_list.json')
+		self.currentreport = []
 
 	def refresh_items(self):
 		global item_list
 		global store
-		wks = authgoogle()
-		item_list, masterlist = downloadrows(wks)
-		store.clear()
-		store.put('itemslist', items=masterlist)
+		try:
+			wks = authgoogle()
+			print 'wks assigned'
+			item_list, masterlist = downloadrows(wks)
+			print 'downloadrows done'
+			store.clear()
+			store.put('itemslist', items=masterlist)
+			self.popup('Success', 'Items refreshed!')
+		except:
+			self.popup('Failed', 'Please try again')
 
 	def items_test(self):
 		global store
 		print store['itemslist']
 
+	def popup(self, title, message):
+		# create content and add to the popup
+		content = Button(text=message)
+		popup = Popup(content=content, title=title, auto_dismiss=False)
+
+		# bind the on_press event of the button to the dismiss function
+		content.bind(on_press=popup.dismiss)
+
+		# open the popup
+		popup.open()
 
 
-
-class New_Report(BoxLayout):
+class Add_Items_Tab(BoxLayout):
 	pass
 
 
@@ -61,19 +78,25 @@ class Item_Scroller(ScrollView):
 
 
 class Item_List(GridLayout):
+	global store
+
 	
 	def __init__(self, **kwargs):
 		super(Item_List, self).__init__(**kwargs)
 		self.add_button()
 		self.bind(minimum_height=self.setter('height'))
+		self.currentreport = []
 
 	def item_search(self, search):
 		self.clear_widgets()
 		for key in store['itemslist']['items']:
 			selector = (Item_Selector())
-			if search in store['itemslist']['items'][key]:
-				print 'hooray!'
-				selector.label.text = store['itemslist']['items'][key]
+			if (
+				search.lower() in store['itemslist']['items'][key].lower()
+				or
+				search in key
+				):
+				selector.label.text =  key + ':   ' + store['itemslist']['items'][key]
 				selector.id = 'code_%s' % key
 				self.add_widget(selector)
 
@@ -84,18 +107,33 @@ class Item_List(GridLayout):
 		for key in store['itemslist']['items']:
 			selector = (Item_Selector())
 			selector.label.text = key + ':   ' + store['itemslist']['items'][key]
-			selector.id = 'code_%s' % key
+			selector.id = 'XXX%s' % key
 			self.add_widget(selector)
 
-'''				btn = Button(
-					text=store['itemslist']['items'][key],
-					size_x=self.width, 
-					size_y=40, 
-					size_hint_y=None)
-				self.add_widget(btn)
-'''
+
+	def add_item(self, itemid, amount):
+		global store
+		itemid = itemid[4:]
+		print itemid, amount
+		entry = (itemid, int(amount))
+		self.currentreport.append(entry)
+		print self.currentreport
 
 
+class Current_List_Tab(BoxLayout):
+	pass
+
+class Current_Scroller(ScrollView):
+	pass
+
+class Current_List(GridLayout):
+	def __init__(self, **kwargs):
+		super(Current_List, self).__init__(**kwargs)
+		self.bind(minimum_height=self.setter('height'))
+		self.currentreport = []
+
+class Current_Selector(BoxLayout):
+	pass
 
 class Tabs(TabbedPanel):
 	pass
@@ -134,15 +172,16 @@ def downloadrows(wks):
 
 	#grab lists
 	uom_list = wks.col_values(2)[3:132]
+	print 'code grabbed'
 	item_list = wks.col_values(3)[3:132]
-
+	print 'items grabbed'
 	#build list of lists
 	masterlist = {}
 
 	for i in range(0, len(item_list)):
 		masterlist[uom_list[i]] = item_list[i]
-	print masterlist
-
+#	print masterlist
+	print 'items joined'
 
 	return item_list, masterlist
 
