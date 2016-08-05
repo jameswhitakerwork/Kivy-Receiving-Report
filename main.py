@@ -161,10 +161,12 @@ class Current_List(GridLayout):
 		Clock.schedule_interval(self.refreshcurrentitems, 1)
 
 	def refreshcurrentitems(self, dt):
+		global lookup_table
 		self.clear_widgets()
 		for entry in currentreport:
+
 			newselector = Current_Selector()
-			newselector.label.text = '%i %i' % (entry[0], entry[1])
+			newselector.label.text = '%s: %i' % (lookup(entry[0]), entry[1])
 			newselector.code = entry[0]
 			self.add_widget(newselector)
 
@@ -228,7 +230,9 @@ def downloadrows(wks):
 		masterlist[code_list[i]] = item_list[i]
 #	print masterlist
 	print 'items joined'
+
 	print masterlist
+
 	return item_list, masterlist
 
 
@@ -239,6 +243,11 @@ def make_lookup_table():
 	print lookup_table
 	return lookup_table
 
+def lookup(key):
+	for entry in lookup_table:
+		if key in entry:
+			print entry[1]
+			return entry[1]
 
 
 if __name__ == "__main__":
