@@ -10,6 +10,7 @@ ReceivingRoot:
 #2
 	do_default_tab: False
 	id: tabs
+	cl: currentlist
 
 #	TabbedPanelItem:
 #	#3
@@ -26,7 +27,8 @@ ReceivingRoot:
 
 	TabbedPanelItem:
 		text: 'Current Items'
-		Current_List_Tab
+		Current_List_Tab:
+			id: currentlist
 
 
 <MainMenu>:
@@ -89,7 +91,9 @@ ReceivingRoot:
 	size_hint_y: None
 	size_y: '40dp'
 	orientation: 'horizontal'
+	label: label
 	Label:
+		id: label
 		text: 'Label'
 	Button:
 		text: 'Button'
