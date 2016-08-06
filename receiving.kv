@@ -1,4 +1,4 @@
-
+#: import main main
 
 ReceivingRoot:
 
@@ -80,14 +80,18 @@ ReceivingRoot:
 	size_hint_y: None
 	size_y: '40dp'
 	orientation: 'horizontal'
+	id: selector
 	label: label
 	Label:
+		size_hint_x: 0.76
 		id: label
 		text: 'Label'
 	Button:
-		text: 'Button'
-	Button:
-		text: 'Button'
+		size_hint_x: 0.12
+		text: 'Delete'
+		on_release: 
+			self.parent.parent.remove_widget(selector)
+			self.parent.remove_item_on_delete()
 
 
 <Search_Bar>:
@@ -144,28 +148,43 @@ ReceivingRoot:
 		text: '*'
 		text_size: root.width, None
 		size: self.texture_size
+		size_hint_y: 0.1
 
 	BoxLayout:
+		size_y: "5dp"
+		size_hint_y: 0.1
 		orientation: 'horizontal'
-		Slider:
+		Item_Slider:
 			size_hint_x: 0.75
 			id: slider
 			step: 1
 			range: (0, 100)
+			value: int(textinput.text)
+			secretvalue: int(textinput.text)
 
-		Label:
-			size_hint_x: 0.05
-			text: str(int(slider.value))
-
-		Button:
+		BoxLayout:
 			size_hint_x: 0.2
-			text: 'Add'
-			on_release: 
-				self.parent.parent.parent.add_item(self.parent.parent.id, slider.value)
-				slider.value = 0
+			TextInput:
+				id: textinput
+				multiline: False
+				size_hint_x: 0.1
+				text: str(int(slider.value))
+				on_text_validate:
+					self.parent.parent.parent.parent.add_item(self.parent.parent.parent.id, int(self.text))
+					slider.value = 0
 
 
+			Add_Button:
+				size_hint_x: 0.1
+				text: 'Add'
+				on_release: 
+					self.parent.parent.parent.parent.add_item(self.parent.parent.parent.id, int(textinput.text))
+					slider.value = 0
+					self.change_colour(self)
 
+<Added_Bubble>:
+	BubbleButton:
+		text: 'test'
 
 
 
