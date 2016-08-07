@@ -59,7 +59,30 @@ ReceivingRoot:
 	Item_Scroller
 
 <Current_List_Tab>:
-	Current_Scroller
+	Screen_Manager
+
+<Screen_Manager>:
+	Report_Screen
+	Submit_Screen
+
+<Report_Screen>:
+	name: 'report'
+	BoxLayout:
+		orientation: 'vertical'
+		Current_Scroller
+		Button:
+			size_y: '2'
+			size_hint_y: 0.1
+			text: 'Submit Report'
+			on_release: 
+#				app.root.submit_report()
+				root.manager.transition.direction = 'left'
+				root.manager.current = 'submit'
+<Submit_Screen>:
+	name: 'submit'
+	Submit_Report_Popup
+
+
 
 <Current_Scroller>:
 	Current_List:
@@ -185,6 +208,55 @@ ReceivingRoot:
 <Added_Bubble>:
 	BubbleButton:
 		text: 'test'
+
+<Submit_Report_Popup>:
+	autodismiss: False
+	orientation: 'vertical'
+	padding: '30dp'
+
+	Label:
+		text: 'Date:'
+
+	TextInput:
+		id: date
+		multiline: False
+
+	Label:
+		text: 'Location:'
+
+	TextInput:
+		id: location
+		multiline: False
+
+
+	Label:
+		text: 'Report By:'
+
+	TextInput:
+		id: reportby
+		multiline: False
+
+	Label
+
+
+	BoxLayout:
+		orientation: 'horizontal'
+		Button
+			text: 'BACK'
+			on_release: 
+				root.parent.manager.current = 'report'
+				root.parent.manager.transition.direction = 'right'
+
+		Button:
+			text: 'SUBMIT'
+			on_release: 
+				app.root.create_report(date.text, location.text, reportby.text)			
+				root.parent.manager.current = 'report'
+				root.parent.manager.transition.direction = 'right'
+
+
+
+
 
 
 

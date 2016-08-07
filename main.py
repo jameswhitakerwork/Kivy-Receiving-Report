@@ -13,8 +13,15 @@ from kivy.uix.slider import Slider
 from kivy.uix.popup import Popup
 from kivy.uix.bubble import Bubble
 from kivy.animation import Animation, AnimationTransition
+from kivy.uix.screenmanager import ScreenManager, Screen
+
 from functools import partial
 from kivy.clock import Clock
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+from email.MIMEBase import MIMEBase
+from email import encoders
 
 
 import sys
@@ -74,6 +81,58 @@ class ReceivingRoot(BoxLayout):
 
 		# open the popup
 		popup.open()
+
+	def submit_report(self):
+		self.clear_widgets()
+		reportpopup = Submit_Report_Popup()
+		self.add_widget(reportpopup)
+
+	def create_report(self, date, location, person):
+		print date
+		print location
+
+		report = open('report.csv', 'w')
+		report.write('Date, Location, Code, Item, Amount, UoM, \n')
+		for entry in currentreport:
+			itemname, itemuom = lookup(entry[0])
+			itemname = itemname.replace(',', '')
+			report.write('%s, %s, %s, %s,  %s, %s, \n' % (date, location, str(entry[0]), itemname, entry[1], itemuom))
+
+		report.close()
+
+
+
+		fromaddr = "jameswhitakerwork@gmail.com"
+		toaddr = "jameswhitakerwork@gmail.com"
+		 
+		msg = MIMEMultipart()
+		 
+		msg['From'] = fromaddr
+		msg['To'] = toaddr
+		msg['Subject'] = "New Receiving Report"
+		 
+		body = "A new receiving report has been created by %s and attached to this email." % person
+		 
+		msg.attach(MIMEText(body, 'plain'))
+		 
+		filename = "report.csv"
+		attachment = open('report.csv', 'rb')
+		 
+		part = MIMEBase('application', 'octet-stream')
+		part.set_payload((attachment).read())
+		encoders.encode_base64(part)
+		part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+		 
+		msg.attach(part)
+		 
+		server = smtplib.SMTP('smtp.gmail.com', 587)
+		server.starttls()
+		server.login(fromaddr, "CookieTable!1")
+		text = msg.as_string()
+		server.sendmail(fromaddr, toaddr, text)
+		server.quit()
+
+		self.popup('Report Submitted', 'You\'ve submitted the report successfully')
 
 
 class Add_Items_Tab(BoxLayout):
@@ -161,6 +220,8 @@ class Current_List_Tab(BoxLayout):
 	def test(self):
 		print 'test'
 
+
+
 class Current_Scroller(ScrollView):
 	pass
 
@@ -194,7 +255,9 @@ class Current_Selector(BoxLayout):
 		self.code = StringProperty()
 
 	def remove_item_on_delete(self):
-		print self.code
+		for entry in currentreport:
+			if entry[0] == self.code:
+				currentreport.remove(entry)
 
 
 class Tabs(TabbedPanel):
@@ -220,9 +283,18 @@ class Add_Button(Button):
 		self.text = 'Added!'
 		print 'animation fired'
 
+class Submit_Report_Popup(BoxLayout):
+	pass
 
 
+class Screen_Manager(ScreenManager):
+	pass
 
+class Report_Screen(Screen):
+	pass
+
+class Submit_Screen(Screen):
+	pass
 
 
 
