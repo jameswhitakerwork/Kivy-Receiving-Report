@@ -22,6 +22,8 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.MIMEBase import MIMEBase
 from email import encoders
+import threading
+import time
 
 
 import sys
@@ -88,51 +90,54 @@ class ReceivingRoot(BoxLayout):
 		self.add_widget(reportpopup)
 
 	def create_report(self, date, location, person):
-		print date
-		print location
+		try:
+			print date
+			print location
 
-		report = open('report.csv', 'w')
-		report.write('Date, Location, Code, Item, Amount, UoM, \n')
-		for entry in currentreport:
-			itemname, itemuom = lookup(entry[0])
-			itemname = itemname.replace(',', '')
-			report.write('%s, %s, %s, %s,  %s, %s, \n' % (date, location, str(entry[0]), itemname, entry[1], itemuom))
+			report = open('report.csv', 'w')
+			report.write('Date, Location, Code, Item, Amount, UoM, \n')
+			for entry in currentreport:
+				itemname, itemuom = lookup(entry[0])
+				itemname = itemname.replace(',', '')
+				report.write('%s, %s, %s, %s,  %s, %s, \n' % (date, location, str(entry[0]), itemname, entry[1], itemuom))
 
-		report.close()
+			report.close()
 
 
 
-		fromaddr = "jameswhitakerwork@gmail.com"
-		toaddr = "jameswhitakerwork@gmail.com"
-		 
-		msg = MIMEMultipart()
-		 
-		msg['From'] = fromaddr
-		msg['To'] = toaddr
-		msg['Subject'] = "New Receiving Report"
-		 
-		body = "A new receiving report has been created by %s and attached to this email." % person
-		 
-		msg.attach(MIMEText(body, 'plain'))
-		 
-		filename = "report.csv"
-		attachment = open('report.csv', 'rb')
-		 
-		part = MIMEBase('application', 'octet-stream')
-		part.set_payload((attachment).read())
-		encoders.encode_base64(part)
-		part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-		 
-		msg.attach(part)
-		 
-		server = smtplib.SMTP('smtp.gmail.com', 587)
-		server.starttls()
-		server.login(fromaddr, "CookieTable!1")
-		text = msg.as_string()
-		server.sendmail(fromaddr, toaddr, text)
-		server.quit()
+			fromaddr = "jameswhitakerwork@gmail.com"
+			toaddr = "jameswhitakerwork@gmail.com"
+			 
+			msg = MIMEMultipart()
+			 
+			msg['From'] = fromaddr
+			msg['To'] = toaddr
+			msg['Subject'] = "New Receiving Report"
+			 
+			body = "A new receiving report has been created by %s and attached to this email." % person
+			 
+			msg.attach(MIMEText(body, 'plain'))
+			 
+			filename = "report.csv"
+			attachment = open('report.csv', 'rb')
+			 
+			part = MIMEBase('application', 'octet-stream')
+			part.set_payload((attachment).read())
+			encoders.encode_base64(part)
+			part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+			 
+			msg.attach(part)
+			 
+			server = smtplib.SMTP('smtp.gmail.com', 587)
+			server.starttls()
+			server.login(fromaddr, "CookieTable!1")
+			text = msg.as_string()
+			server.sendmail(fromaddr, toaddr, text)
+			server.quit()
 
-		self.popup('Report Submitted', 'You\'ve submitted the report successfully')
+			self.popup('Report Submitted', 'You\'ve submitted the report successfully')
+		except:
+			self.popup('Failed', 'Please retry with an internet connection.')
 
 
 class Add_Items_Tab(BoxLayout):
@@ -295,6 +300,12 @@ class Report_Screen(Screen):
 
 class Submit_Screen(Screen):
 	pass
+
+
+
+
+#class Refresh_Items_Thread(threading.Thread):
+
 
 
 
