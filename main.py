@@ -57,15 +57,11 @@ class ReceivingRoot(BoxLayout):
 		global item_list
 		global store, lookuptable
 		try:
-			wks = authgoogle()
-			print 'wks assigned'
-			item_list, masterlist = downloadrows(wks)
-			print 'downloadrows done'
-			store.clear()
-			store.put('itemslist', items=masterlist)
-			self.popup('Success', 'Items refreshed!')
+			refresh = Refresh_Items_Thread()
+			refresh.start()
+			self.popup('Refreshing items...', 'Downloading rows...')
 		except:
-			self.popup('Failed', 'Please try again')
+			self.popup('Failed!', 'You need internet access to download rows')
 		lookup_table = make_lookup_table()
 
 
@@ -304,8 +300,24 @@ class Submit_Screen(Screen):
 
 
 
-#class Refresh_Items_Thread(threading.Thread):
+class Refresh_Items_Thread(threading.Thread):
+	def __init__(self):
+		threading.Thread.__init__(self)
+		self.status = ''
 
+
+	def run(self):
+			global store
+			self.status = 'Assigning the workbook...'
+			wks = authgoogle()
+			print 'wks assigned'
+			self.status = 'downloaded rows...'
+			item_list, masterlist = downloadrows(wks)
+			print 'downloadrows done'
+
+			store.clear()
+			store.put('itemslist', items=masterlist)
+			self.status = 'Completed! Items refreshed'
 
 
 
